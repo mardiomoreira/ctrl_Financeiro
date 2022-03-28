@@ -2,6 +2,7 @@ from ast import Return
 from tkinter import *
 from tkinter.messagebox import showinfo
 import sqlite3
+from sqlite3 import Error
 class FUNCOES():
     def conectarBD(self):
         self.conn = sqlite3.connect("financeiro.db3")
@@ -75,3 +76,28 @@ class FUNCOES():
         self.cur.execute('SELECT id_mov, mov_descricao, descri_cat,mov_data,mov_valor FROM vw_movimentacao;')
         self.rowstreview = self.cur.fetchall()
         return self.rowstreview
+    def pesquisaDatas(self, dataMAIOR,dataMENOR):
+        self.conectarBD()
+        self.cur = self.conn.cursor()
+        self.cur.execute(f"""SELECT id_mov,tipo_cat,mov_descricao,mov_data,mov_valor  FROM vw_movimentacao WHERE mov_data BETWEEN '{dataMENOR}' AND '{dataMAIOR}';""")
+        self.resultado = self.cur.fetchall()
+        return self.resultado
+    def pesquisaDESPESAS(self, dataMAIOR,dataMENOR):
+        self.conectarBD()
+        self.cur = self.conn.cursor()
+        self.cur.execute(f"""SELECT SUM(mov_valor) FROM vw_movimentacao WHERE tipo_cat = 'DESPESA' AND mov_data BETWEEN '{dataMENOR}' AND '{dataMAIOR}';""")
+        self.despesas = self.cur.fetchall()
+        return self.despesas
+    def pesquisaRENDA(self, dataMAIOR,dataMENOR):
+        self.conectarBD()
+        self.cur = self.conn.cursor()
+        self.cur.execute(f"""SELECT SUM(mov_valor) FROM vw_movimentacao WHERE tipo_cat = 'RENDA' AND mov_data BETWEEN '{dataMENOR}' AND '{dataMAIOR}';""")
+        self.renda = self.cur.fetchall()
+        return self.renda
+    def dataFORMATADA_BR(self, data):
+        self.data_fatiada = data.split('-')
+        self.ano = self.data_fatiada[0]
+        self.Mes = self.data_fatiada[1]
+        self.dia = self.data_fatiada[2]
+        self.data_BR = self.dia+str('/')+self.Mes+str('/')+self.ano
+        return self.data_BR
